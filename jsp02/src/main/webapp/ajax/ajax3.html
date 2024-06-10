@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Ajax3</title>
+	<script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script>
+		$(function () {
+			$("#search").keyup(function () {
+				let search = $("#search").val();
+				if (search.length == 0) { // 입력값이 없는 경우
+					$("#div1").css("visibility", "hidden");
+				} else {
+					$("#div1").css("visibility", "visible");
+					$.ajax({
+						url: "result3.jsp",
+						data: {"search": search},
+						success: function (txt) { // 콜백 함수
+							$("#div1").html(txt);
+						}
+					});
+				}
+			});
+		});
+	</script>
+</head>
+
+<body>
+	키워드를 입력하세요
+	<input type="text" id="search">
+	<div id="div1">검색 결과 출력 영역</div>
+</body>
+
+</html>

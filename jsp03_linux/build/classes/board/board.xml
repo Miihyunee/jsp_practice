@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+	<select id="list" resultType="board.BoardDTO">
+		SELECT *
+		FROM(
+		SELECT rownum as rn,
+		A.*
+		from(
+		SELECT num, writer, subject, reg_date, hit,
+		(SELECT count(*)
+		FROM board_comment
+		WHERE board_num = b.num) count_comments,
+		filename,
+		filesize, down, group_num, re_order, re_depth
+		FROM board b
+		ORDER BY
+		group_num DESC, re_order ASC
+		)A
+		)
+		WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO board(num, writer, subject, contents,
+		passwd, ip, filename, filesize, group_num, re_order, re_depth )
+		VALUES
+		(
+		(SELECT
+		nvl(MAX(num) +1,1) FROM board), #{writer}, #{subject},
+		#{contents},
+		#{passwd}, #{ip}, #{filename}, #{filesize}, (SELECT
+		nvl(MAX(num) +1,1) FROM board), 1, 0)
+	</insert>
+
+	<select id="filename" resultType="String">
+		SELECT filename FROM board
+		WHERE num = #{num}
+	</select>
+
+	<update id="plus_down">
+		UPDATE board SET down = down + 1 WHERE num = #{num}
+	</update>
+
+	<select id="view" resultType="board.BoardDTO">
+		SELECT * FROM board WHERE num =
+		#{num}
+	</select>
+
+	<update id="plus_hit">
+		UPDATE board SET hit = hit + 1 WHERE num = #{num}
+	</update>
+
+	<insert id="insert_comment">
+		INSERT INTO board_comment (comment_num, board_num,
+		writer, contents)
+		VALUES ((SELECT nvl(MAX(comment_num)+1, 1) FROM
+		board_comment), #{board_num}, #{writer}, #{contents})
+	</insert>
+
+	<select id="list_comment" resultType="board.BoardCommentDTO">
+		SELECT comment_num,
+		board_num, writer, contents, to_char(reg_date, 'yyyy-mm-dd HH:mi:ss')
+		reg_date
+		FROM board_comment
+		WHERE board_num = #{board_num}
+		ORDER BY
+		comment_num
+	</select>
+
+	<update id="update_order">
+		UPDATE board SET re_order = re_order + 1
+		WHERE
+		group_num = #{group_num}
+		AND re_order >= #{re_order}
+	</update>
+
+	<insert id="insert_reply">
+		INSERT INTO board (num, writer, subject, passwd,
+		group_num,
+		re_order, re_depth, contents, ip, filename,
+		filesize)
+		VALUES
+		((SELECT nvl(MAX(num) +1, 1) FROM board), #{writer},
+		#{subject},
+		#{passwd}, #{group_num}, #{re_order},
+		#{re_depth}, #{contents}, #{ip},
+		#{filename}, #{filesize}
+		)
+	</insert>
+
+	<select id="count" resultType="int">
+		SELECT count(*) from board
+	</select>
+
+
+	<select id="search_list" resultType="board.BoardDTO">
+		SELECT *
+		FROM(
+		SELECT rownum as rn, A.*
+		FROM(
+		SELECT
+		num,writer,subject,reg_date,hit,
+		(select count(*) FROM board_comment
+		WHERE board_num=b.num) count_comments,
+		filename, filesize, down,
+		group_num, re_order, re_depth
+		from board b
+		<choose>
+			<when test="search_option!='all'">
+				WHERE #{search_option} like '%' || #{keyword}||'%'
+			</when>
+			<when test="search_option=='all'">
+				WHERE writer like '%'||#{keyword}||'%'
+				or subject like'%'||#{keyword}||'%'
+				or contents like'%'||#{keyword}||'%'
+			</when>
+		</choose>
+		ORDER BY group_num DESC, re_order ASC
+		)A
+		)
+		WHERE rn between #{start} and
+		#{end}
+	</select>
+
+	<select id="search_count" resultType="int">
+		SELECT count(*) FROM board
+		<choose>
+			<when test="search_option!='all'">
+				WHERE ${search_option}like'%'||#{keyword}||'%'
+			</when>
+			<when test="search_option=='all'">
+				WHERE writer LIKE '%' || #{keyword} || '%'
+				OR subject LIKE '%' || #{keyword} || '%'
+				OR contents LIKE '%' || #{keyword} || '%'
+			</when>
+		</choose>
+	</select>
+
+	<select id="check_pwd" resultType="String">
+		SELECT passwd FROM board WHERE
+		num = #{num} AND passwd = #{passwd}
+	</select>
+	
+	<update id="update">
+		UPDATE board SET = re_order + 1
+		WHERE group_num = #{group_num}
+		AND re_order >= #{re_order}
+	</update>
+	
+	<delete id="delete">
+		DELETE FORM board WHERE num = #{num}
+	</delete>
+</mapper>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Ajax2</title>
+	<script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script>
+		$(function () {
+			$("#btnLogin").click(function () {
+				let id = $("#id").val();
+				let pwd = $("#pwd").val();
+				let params = {"id": id, "pwd": pwd};
+				$.ajax({
+					type: "post",
+					url: "result2.jsp",
+					data: params,
+					success: function (txt) {
+						$("#div1").html(txt);
+					}
+				});
+			});
+		});
+	</script>
+</head>
+
+<body>
+	아이디 : <input id="id"><br>
+	비 번 : <input type="password" id="pwd"><br>
+	<input type="button" value="확인" id="btnLogin">
+	<div id="div1">결과 출력 영역</div>
+</body>
+
+</html>

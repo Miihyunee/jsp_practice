@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="guestbook">
+	<select id="list" resultType="guestbook.GuestbookDTO">
+		SELECT idx, name, email, contents,
+		post_date
+		FROM guestbook
+		WHERE ${searchkey} LIKE '%' || #{search} || '%'
+		ORDER BY idx DESC
+	</select>
+
+	<select id="list_all" resultType="guestbook.GuestbookDTO">
+		SELECT idx, name, email,
+		contents, post_date
+		FROM guestbook
+		WHERE name LIKE '%' || #{search} ||
+		'%'
+		OR contents LIKE '%' || #{search} || '%'
+		ORDER BY idx DESC
+	</select>
+
+	<select id="check_pwd" resultType="int">
+		SELECT COUNT(*) FROM guestbook
+		WHERE idx = ${idx} AND passwd = #{passwd}
+	</select>
+
+	<select id="detail" resultType="guestbook.GuestbookDTO">
+		SELECT * FROM guestbook WHERE idx
+		= #{idx}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO guestbook (idx, name, email, passwd,
+		contents)
+		VALUES (guestbook_seq.nextval, #{name}, #{email}, #{passwd},
+		#{contents})
+	</insert>
+	
+	<update id="update">
+		UPDATE guestbook SET name = #{name}, email = #{email}, passwd = #{passwd}, contents = #{contents}
+		WHERE idx = #{idx}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM guestbook WHERE idx = #{idx}
+	</delete>
+</mapper>

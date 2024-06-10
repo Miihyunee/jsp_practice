@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="memo">
+	<select id="list" resultType="java.util.Map">
+		SELECT idx , 
+				   writer ,
+				   memo ,
+				   to_char(post_date, 'yyyy-mm-dd hh24:mi:ss') post_date
+		  FROM memo
+	    WHERE ${search_option} LIKE '%' || #{search} || '%'
+		 ORDER BY idx DESC
+	</select>
+
+	<select id="list_all" resultType="java.util.Map">
+		SELECT idx ,
+				   writer ,
+				   memo ,
+				   to_char(post_date, 'yyyy-mm-dd hh24:mi:ss') post_date
+		  FROM memo
+		WHERE writer LIKE '%' || #{search} || '%'
+		      OR memo LIKE '%' || #{search} || '%'
+		 ORDER BY idx DESC
+	</select>
+
+	<select id="view" resultType="java.util.Map">
+		SELECT * 
+		  FROM memo 
+		WHERE idx = #{idx}
+	</select>
+
+	<insert id="insert">
+		INSERT INTO memo (idx, writer, memo, post_date) 
+	    VALUES ((SELECT NVL(MAX(idx)+1,1) FROM memo), #{writer}, #{memo}, SYSDATE)
+	</insert>
+
+	<update id="update">
+		UPDATE memo SET writer = #{writer}, memo = #{memo}
+		WHERE idx = #{idx}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM memo WHERE idx = #{idx}
+	</delete>
+</mapper>

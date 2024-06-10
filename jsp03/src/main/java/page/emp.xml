@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="emp">
+	<select id="list" resultType="page.EmpDTO">
+		SELECT *
+			FROM (
+						SELECT A.*, rownum as rn
+						FROM (
+									SELECT empno, ename
+									FROM test
+									ORDER BY empno
+						) A
+			)
+			WHERE rn BETWEEN #{start} AND #{end}
+	</select>
+
+	<select id="count" resultType="int">
+		SELECT COUNT(*) FROM test
+	</select>
+</mapper>

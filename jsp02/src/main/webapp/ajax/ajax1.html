@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Ajax1</title>
+	<script src="http://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script>
+		$(function () {
+			$("#button1").click(function () {
+				let num = $("#num").val();
+				$.ajax({
+					type: "post",
+					url: "result1.jsp",
+					data: {"num": num},
+					success: function (txt) {
+						$("#result").html(txt);
+					}
+				});
+			});
+		});
+	</script>
+</head>
+
+<body>
+	<h2>동기식</h2>
+	<form action="result1.jsp">
+		number : <input type="text" name="num">
+		<input type="submit" value="확인">
+	</form>
+
+	<h2>비동기식</h2>
+	number :
+	<input type="text" id="num">
+	<input type="button" id="button1" value="확인">
+	<div id="result">결과 출력 영역</div>
+</body>
+
+</html>
